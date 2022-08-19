@@ -10,7 +10,8 @@ class Login extends Component {
         username: '',
         password: '',
         isLoggedIn: false,
-        isError: false
+        isError: false,
+        errorMessage: ''
     }
 
     componentDidMount() {
@@ -24,7 +25,8 @@ class Login extends Component {
         const password = document.getElementById("password").value;
 
         if (!(username && password)) {
-            this.setState({isError: true})
+            this.setState({isError: true});
+            this.setState({errorMessage: "Missing username or password!"});
             return
         }
 
@@ -44,16 +46,21 @@ class Login extends Component {
                         isError: false
                     })
                 }
+                else if (response.status === 401){
+                    this.setState({isError: true})
+                    this.setState({errorMessage: "Incorrect credentials, please try again!"})
+                }
             })
             .catch(error => {
                 handleLogError(error)
                 this.setState({isError: true})
+                this.setState({errorMessage: "Some error occurred, please try again!"})
             })
     }
 
 
     render() {
-        const {isLoggedIn, isError} = this.state
+        const {isLoggedIn, isError, errorMessage} = this.state
         if (isLoggedIn) {
             return <Navigate to={"/"}/>
         } else {
@@ -61,6 +68,7 @@ class Login extends Component {
                 <div>
                     <form className="addPlantCard">
                         <h1>Log in</h1>
+                        <h5 style={isError ? {display:"block"} : {display: "none"}}>{errorMessage}</h5>
                         <div className="formItem">
                             <label htmlFor="user_name">Your name: </label>
                             <input type="text" name="user_name" id="user_name" required></input>
